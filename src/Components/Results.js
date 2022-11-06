@@ -53,7 +53,7 @@ class Results extends React.Component{
         if (this.state.rule === 0)
         return (
             <div className="menu">
-                <button className="button2" id={1} value='1' name="1" onClick={this.changeRule}> Rule 1 </button>
+                <button className="button2" value='1'  onClick={this.changeRule}> Rule 1 </button>
                 <button className="button2" value='2'  onClick={this.changeRule}> Rule 2 </button>
                 <button className="button2" value='3'  onClick={this.changeRule}> Rule 3 </button>
                 <button className="button2" value='4'  onClick={this.changeRule}> Rule 4 </button>

@@ -1,11 +1,16 @@
 import React from "react";
 import Form from "./Form";
+import Principii from "./Principii";
 
 class FirstPage extends React.Component{
     constructor(){
         super();
         this.state = {
             x : 0
+        }
+
+        this.goToPrincipii = () => {
+            this.setState({ x: 2 });
         }
 
         this.goToForm = () => {
@@ -31,7 +36,7 @@ class FirstPage extends React.Component{
                     Investing is not a game where the guy with the 160 IQ beats the guy with 130 IQ.”</i> -Warren Buffet
                 </span>
                 
-                <button style={{marginTop:"40px"}} onClick={this.goToForm}>Principii fundamentale</button>
+                <button style={{marginTop:"40px"}} onClick={this.goToPrincipii}>Principii fundamentale</button>
                 <button style={{marginTop:"40px"}} onClick={this.goToForm}>Analizeaza compania</button>
 
                 <p className="zeroMargin" style={{textAlign:"left", fontSize:"15px", color: "black"}}><i>Madalin Sirbu<br/>licenta v3.0</i></p>
@@ -42,9 +47,14 @@ class FirstPage extends React.Component{
             </div>
         );
         }
-        else{
+        else if (this.state.x === 1){
             return(
                 (<Form onChange={this.back}/>)
+            )
+        }
+        else {
+            return(
+                (<Principii onChange={this.back}/>)
             )
         }
     }

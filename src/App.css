@@ -115,7 +115,6 @@
   font-weight: bolder;
   color: rgb(126, 35, 12);
   background-color: #c09c3c;
-
   border-style: solid;
   border-color: rgb(126, 35, 12);
   border-width: 2px;
@@ -160,10 +159,6 @@ a{
   color: white;
 }
 
-div{
-  font-size: 23px;
-}
-
 span{
   font-size: 23px;
   text-align: center;
@@ -181,6 +176,18 @@ h2 {
   text-align: center;
 }
 
+div{
+  font-size: 23px;
+}
+
+p {
+  text-align: justify;
+}
+
+i {
+  text-align: right;
+}
+
 /* .goldText{
   color: #fae5ab;
   font-weight: bold;
@@ -190,3 +197,24 @@ h2 {
   margin-top: 50px;
   margin-bottom: 0px;
 }
+
+.clasaSelect{
+  border-radius: 0.3rem;
+	background-color: rgb(219, 194, 130);
+	height: 30px;
+	width: 220px;
+  font-size: 100%;
+  margin-bottom: 1%;
+  font-weight: bold;
+  font-size: 21px;
+}
+
+.toastBody {
+  /* font-family: "Atlas Grotesk Web", Arial, Helvetica, sans-serif;
+  color: #10171D; #10171D */
+  font-size: 15px;
+}
+
+/* body {
+  font-family: 'Open Sans';
+} */

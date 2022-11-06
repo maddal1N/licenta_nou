@@ -1,33 +1,32 @@
-import React from "react";
+import React, { Component } from "react";
 import Results from "./Results";
 import update from 'react-addons-update';
+import toast, { Toaster } from 'react-hot-toast';
+
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 import {Route, BrowserRouter as Router, Switch, Link} from "react-router-dom";
+import { duration } from "@material-ui/core";
 
 class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // sales: 0,
-      // shares: 0,
-      // price: 0,
-      // assets: 0,
-      // liab: 0,
-      // bookValue: 0,
-      // earnings: [0,0,0,0,0,0,0,0,0,0],
-      // dividends: [0,0,0,0,0,0,0,0,0,0],
-      // eps: [0,0,0,0,0,0,0,0,0,0],
-      // x: 0
-      sales: null,
-      shares: null,
-      price: null,
-      assets: null,
-      liab: null,
-      bookValue:null,
-      earnings: [null,null,null,null,null,null,null,null,null,null],
-      dividends: [null,null,null,null,null,null,null,null,null,null],
-      eps:[null,null,null,null,null,null,null,null,null,null],
-      x: 0
+      name: '',
+      sales: '',
+      shares: '',
+      price: '',
+      assets: '',
+      liab: '',
+      bookValue: '',
+      earnings: ['', '', '', '', '', '', '', '', '', ''],
+      dividends: ['', '', '', '', '', '', '', '', '', ''],
+      eps: ['', '', '', '', '', '', '', '', '', ''],
+      x: 0,
+      z: 1,
     };
 
     this.handleChange = (evt) => {
@@ -44,7 +43,7 @@ class Form extends React.Component {
           }
         }
       }));
-   }
+    }
 
     this.goToResult = () => {
       this.setState({ x: 1 });
@@ -54,12 +53,252 @@ class Form extends React.Component {
       this.setState({ x: 0 });
     }
 
+    this.saveCompany = () =>{
+      if(this.state.name == null || this.state.name === ''){
+        console.log('Completeaza campul Name pentru salvarea companiei!');
+        this.savedFailed();
+      }
+      else{
+        var companie = this.state;
+        localStorage.setItem(companie.name, JSON.stringify(companie));
+        this.savedSuccess(companie.name);
+      }
+      this.setState({ z: -this.state.z });
+      console.log(this.state.z);
+
+      this.resetSelect();
+    }
+
+    this.deleteCompany = () =>{
+      var companie = this.state;
+      var gasita = localStorage.getItem(companie.name)
+      if(gasita == null){
+        this.deleteFailed(companie.name);
+      }
+      else{
+        localStorage.removeItem(companie.name);
+        this.deleteSuccess(companie.name);
+      }
+
+      this.resetSelect();
+    }
+
+    this.resetSelect=()=>{
+      var selectList = document.getElementById("mySelect");
+      while (selectList.firstChild) {
+        selectList.firstChild.remove()
+      }
+
+      this.initSelect2();
+      // this.setState({
+      //   name: '',
+      //   sales: '',
+      //   shares: '',
+      //   price: '',
+      //   assets: '',
+      //   liab: '',
+      //   earnings: [null, null, null, null, null, null, null, null, null, null],
+      //   dividends: [null, null, null, null, null, null, null, null, null, null],
+      //   eps: [null, null, null, null, null, null, null, null, null, null]
+      // })
+    }
+
+    this.clearList = () =>{
+      localStorage.clear();
+      this.clearListSuccess();
+      this.resetSelect();
+    }
+    
+    this.loadCompany = (evt) =>{
+      console.log(evt.target.value);
+      var companie = JSON.parse( localStorage.getItem(evt.target.value) );
+      console.log(companie);
+
+      this.loadedSuccess(companie.name);
+
+      this.setState({
+      name: companie.name,
+      sales: companie.sales,
+      shares: companie.shares,
+      price: companie.price,
+      assets: companie.assets,
+      liab: companie.liab,
+      bookValue:companie.bookValue,
+      earnings: companie.earnings,
+      dividends: companie.dividends,
+      eps:companie.eps,
+      })
+    }
+
+    this.getAllStorage2 = () => {
+      var archive = [],
+        keys = Object.keys(localStorage),
+        i = 0, key;
+
+      for (; key = keys[i]; i++) {
+        archive.push( key + '=' + localStorage.getItem(key));
+      }
+
+      console.log(Object.keys(localStorage))
+      console.log(archive);
+    }
+  }
+
+  componentDidMount(){
+    this.initSelect2();
+  }
+
+  initSelect2 = () => {
+    // ADDED to try to fix the BUG on select
+    const emptyCompany = {
+      name: '',
+      sales: '',
+      shares: '',
+      price: '',
+      assets: '',
+      liab: '',
+      bookValue: '',
+      earnings: ['', '', '', '', '', '', '', '', '', ''],
+      dividends: ['', '', '', '', '', '', '', '', '', ''],
+      eps: ['', '', '', '', '', '', '', '', '', ''],
+    }
+
+    localStorage.setItem(emptyCompany.name, JSON.stringify(emptyCompany));
+
+    var listKeys = Object.keys(localStorage);
+    var selectList = document.getElementById("mySelect");
+
+    for (var i = 0; i < listKeys.length; i++) {
+      var option = document.createElement("option");
+      option.value = listKeys[i];
+      option.text = listKeys[i];
+      selectList.appendChild(option);
+      this.sortSelect(selectList);
+    }
+  }
+
+  componentDidUpdate(){
+    var testt = document.getElementById("mySelect");
+    if(this.state.x === 0 && testt.options.length == 0){
+      this.initSelect2();
+    }
+  }
+
+  sortSelect = (selElem) => {
+    var tmpAry = new Array();
+    for (var i=0;i<selElem.options.length;i++) {
+        tmpAry[i] = new Array();
+        tmpAry[i][0] = selElem.options[i].text;
+        tmpAry[i][1] = selElem.options[i].value;
+    }
+    tmpAry.sort();
+    while (selElem.options.length > 0) {
+        selElem.options[0] = null;
+    }
+    for (var i=0;i<tmpAry.length;i++) {
+        var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+        selElem.options[i] = op;
+    }
+    return;
+  }
+
+  loadedSuccess = (name) => {
+    toast.success(`${name} incarcata cu succes`,
+    {
+      style: {
+        borderRadius: '25px',
+        background: '#BBFFB2'
+      },
+    }
+    );
+  }
+
+  savedSuccess = (name) => {
+    toast.success(`${name} salvata cu succes`,
+    {
+      style: {
+        borderRadius: '25px',
+        background: '#BBFFB2',
+      },
+    }
+    );
+  }
+
+  savedFailed = () => {
+    toast.error(`Adauga un nume!`,
+    {
+      style: {
+        borderRadius: '25px',
+        background: '#FFB2B2',
+      },
+    }
+    );
+  }
+
+  deleteSuccess = (name) => {
+    toast.success(`${name} a fost stearsa cu succes`,
+    {
+      style: {
+        borderRadius: '25px',
+        background: '#BBFFB2',
+      },
+    }
+    );
+  }
+
+  deleteFailed = (name) => {
+    if (name == null || name == '') {
+      toast.error(`Compania nu a fost gasita`,
+        {
+          style: {
+            borderRadius: '25px',
+            background: '#FFB2B2',
+          },
+        }
+      );
+    }
+    else {
+      toast.error(`${name} nu a fost gasita`,
+        {
+          style: {
+            borderRadius: '25px',
+            background: '#FFB2B2',
+          },
+        }
+      );
+    }
+  }
+
+  clearListSuccess = () => {
+    toast.success(`Lista curata cu succes`,
+      {
+        icon: <img style={{ height: "25px", width: "25px" }}
+          src='https://image.flaticon.com/icons/png/512/1214/1214926.png'>
+        </img>,
+        style: {
+          borderRadius: '25px',
+          background: '#BBFFB2',
+        },
+      }
+    );
   }
 
   render() {
+
+    var listKeys = Object.keys(localStorage);
+
+    // const companieCitita = localStorage.getItem('a');
+
     if (this.state.x === 0) {
       return (
         <div className="menuRight">
+          <Toaster />
+
+          <div>
+            <label htmlFor='name'>Company Name</label>
+            <input type='text' className="formInputStyle" name='name' id='name' onChange={this.handleChange} value={this.state.name}/>
+          </div>
+          
           <div>
             <label htmlFor='sales'>Sales</label>
             <input type='number' className="formInputStyle" name='sales' id='sales' onChange={this.handleChange} value={this.state.sales}/>
@@ -187,11 +426,18 @@ class Form extends React.Component {
             <br />
             <label htmlFor='eps10'>2012</label>
             <input type='text' className="formInputStyle" id='9' name='eps' onChange={this.handleChangeArray} value={this.state.eps[9]}/>
+            <br /><br />
+            <label htmlFor='mySelect'>Companie de incarcat:</label>
+            <select id="mySelect" className="formInputStyle" onChange={this.loadCompany}>
+            </select>
           </div>
           <button style={{marginTop:"40px"}} value='Analyse' onClick={this.goToResult}> Analyse </button>
+          <button style={{marginTop:"20px"}} onClick={this.saveCompany}>Save Company</button>
+          <button style={{marginTop:"20px"}} onClick={this.deleteCompany}>Delete Company</button>
+
+          <button style={{marginTop:"20px"}} onClick={this.clearList}>Clear list</button>
           <button style={{marginTop:"20px"}} onClick={this.props.onChange}>Back</button>
 
-          {console.log(this.state)}
         </div>);
     }
     {
